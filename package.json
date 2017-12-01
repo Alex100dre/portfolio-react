@@ -35,6 +35,5 @@
     "eslint-plugin-react": "^7.5.1",
     "prettier": "^1.8.2"
   },
-  // defining proxy for the API
   "proxy": "http://localhost:8080"
 }
