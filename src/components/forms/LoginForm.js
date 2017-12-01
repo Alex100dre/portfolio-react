@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Form, Button } from 'semantic-ui-react';
+import { Form, Button, Message } from 'semantic-ui-react';
 import Validator from 'validator';
 import InlineError from '../messages/InlineError';
 
@@ -26,7 +26,14 @@ class LoginForm extends React.Component {
     this.setState({ errors });
     // If there is no key in errors object, that means there is no error.
     if (Object.keys(errors).length === 0) {
-      this.props.submit(this.state.data);
+      this.setState({loading: true});
+      // We submit the form and if we have some, we catch errors returned by the API.
+      this.props
+      .submit(this.state.data)
+      .catch(err => this.setState({
+        errors: err.response.data.errors,
+        loading: false
+      }));
     }
   };
 
@@ -38,10 +45,16 @@ class LoginForm extends React.Component {
   };
 
   render() {
-    const { data, errors } = this.state;
+    const { data, errors, loading } = this.state;
 
     return (
-      <Form onSubmit={this.onSubmit}>
+      <Form onSubmit={this.onSubmit} loading={loading}>
+        {/* If there is errors returned by the API then we show a message to the user. */}
+        { errors.global && <Message negative>
+          <Message.Header>Oops, something went wrong!</Message.Header>
+          <p>{errors.global}</p>
+        </Message>}
+
         <Form.Field error={!!errors.email}>
           <label htmlFor="email">Email</label>
           <input
